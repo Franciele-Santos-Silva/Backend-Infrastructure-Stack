@@ -1,14 +1,33 @@
-export const createUser = (req, res) => {
+import User from '../models/User.js'
+import crypto from 'node:crypto'
 
-    res.status(200).send({message: "FRANCIELE!!!"})
+export const createUser = async(req, res) => {
+
+    try { 
+        const userToCreate = {
+            id: crypto.randomUUID(),
+            ...req.body
+        }
+
+        const user = await User.create(userToCreate)
+
+        res.status(201).json(user)
+    }   catch(err){
+        res.status(500).json(err)
+    }
 }
 
-export const getAllUser = (req, res) => {
+export const getAllUser = async (req, res) => {
 
-    res.status(200).send({message: "FRANFRAN++!!!"})
+    const users = await User.findAll()
+    res.status(200).json(users)
 }
 
-export const deleteUser = (req, res) => {
+export const deleteUser = async (req, res) => {
 
-    res.status(200).send({message: "Parece que deu certo!!!"})
+    const user = await User.destroy({
+        where: {id: req.params.id}
+    })
+    res.status(200).json(user)
+
 }

@@ -1,9 +1,31 @@
-import express from 'express'
-import userRoutes from './routes.js'
+import express from 'express';
+import dotenv from 'dotenv';
+import User from './models/User.js';
+import config from './config/database.js';
+import userRoutes from './routes.js';
+import { Sequelize } from 'sequelize';
 
-const app = express()
-app.use(express.json())
+dotenv.config();
 
-app.use('/usuarios/', userRoutes)
+const app = express();
+app.use(express.json());
 
-app.listen(3000, () => console.log("Servidor rodando"));
+const sequelize = new Sequelize(config);
+
+User.init(sequelize);
+
+app.use('/usuarios', userRoutes);
+
+const PORT = process.env.PORT;
+
+sequelize
+  .authenticate()
+  .then(() => {
+    console.log('Banco de dados conectado');
+    app.listen(PORT, () => {
+      console.log(`Servidor rodando na porta ${PORT}`);
+    });
+  })
+  .catch((err) => {
+    console.error('Erro ao conectar no banco:', err);
+  });
